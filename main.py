@@ -19,6 +19,7 @@ CORS(app)
 openai.api_key = os.getenv("OPENAI_API_KEY")
 
 CODE_EXECUTION_SERVER = os.getenv("CODE_EXECUTION_SERVER")
+SYSTEM_PROMPT = "You are a code generator and modifier that generates and modifies code based on a prompt in python, you are only allowed to generate, modify and produce a output that is valid python code with no syntax errors, the generated content must not contain anything except for valid python code, don't prompt the user for input."
 
 
 def cleanup_message(message) -> list:
@@ -67,8 +68,6 @@ def generate_code():
     """
     data = request.json
 
-    print(data)
-
     with open("cache.json", encoding="utf-8") as f:
         cache = json.load(f)
 
@@ -81,10 +80,7 @@ def generate_code():
 
     if thread_id == "":
         message = [
-            {
-                "role": "system",
-                "content": "You are a code generator and modifier that generates and modifies code based on a prompt in python, you are only allowed to generate, modify and produce a output that is valid python code with no syntax errors, and the generated content must not contain anything except for valid python code, don't prompt the user for input, dont include any text other than the code except for comments",
-            },
+            {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": prompt},
         ]
         if prompt in cache:
